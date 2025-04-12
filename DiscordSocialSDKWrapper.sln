@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{232784A3-177D-4596-8E15-3A34572FB1A9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Nuget.props = Nuget.props
+		README.md = README.md
+		Version.props = Version.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TmsFrameUnmarshaller", "src\Discord.SocialSdk\Discord.SocialSdk.csproj", "{37D9622F-E05E-439D-84A0-933909727DE4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37D9622F-E05E-439D-84A0-933909727DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37D9622F-E05E-439D-84A0-933909727DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37D9622F-E05E-439D-84A0-933909727DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37D9622F-E05E-439D-84A0-933909727DE4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86098D73-C8DA-4B65-8D1F-4D3DFD95B193}
+	EndGlobalSection
+EndGlobal
