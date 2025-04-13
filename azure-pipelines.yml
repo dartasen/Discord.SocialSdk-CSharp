@@ -26,7 +26,7 @@ pr:
 #      image: 'macOS-latest'
 
 jobs:
-  - job: Build
+  - job: WindowsBuild
     displayName: 'Build (Windows)'
     pool:
       vmImage: 'windows-latest'
@@ -44,7 +44,7 @@ jobs:
         displayName: Run Tests
         inputs:
           script: 'dotnet test $(PathToSolution) --configuration $(BuildConfiguration) --verbosity normal'
-  - job: Build
+  - job: UbuntuBuild
     displayName: 'Build (Ubuntu)'
     pool:
       vmImage: 'ubuntu-latest'
@@ -62,7 +62,7 @@ jobs:
         displayName: Run Tests
         inputs:
           script: 'dotnet test $(PathToSolution) --configuration $(BuildConfiguration) --verbosity normal'
-  - job: Build
+  - job: MacOSBuild
     displayName: 'Build (MacOS)'
     pool:
       vmImage: 'macOS-latest'
