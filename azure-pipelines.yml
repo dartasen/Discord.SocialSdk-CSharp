@@ -46,6 +46,7 @@ jobs:
           script: 'dotnet test $(PathToSolution) --configuration $(BuildConfiguration) --verbosity normal'
   - job: UbuntuBuild
     displayName: 'Build (Ubuntu)'
+    dependsOn: WindowsBuild
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -64,6 +65,7 @@ jobs:
           script: 'dotnet test $(PathToSolution) --configuration $(BuildConfiguration) --verbosity normal'
   - job: MacOSBuild
     displayName: 'Build (MacOS)'
+    dependsOn: UbuntuBuild
     pool:
       vmImage: 'macOS-latest'
     steps:
