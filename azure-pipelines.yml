@@ -1,0 +1,38 @@
+variables:
+  PathToSolution: './DiscordSocialSDKWrapper.sln'
+  PathToSocialSdkProject: './Discord.SocialSdk/Discord.SocialSdk.csproj'
+  DotnetSdkVersion: '9.x'
+  BuildConfiguration: 'Release'
+
+trigger:
+  branches:
+    include:
+      - master
+
+jobs:
+  - job: Build
+    strategy:
+      matrix:
+        windows:
+          image: 'windows-latest'
+        linux:
+          image: 'ubuntu-latest'
+        macOS:
+          image: 'macOS-latest'
+    pool:
+      vmImage: $(image)
+    displayName: Build Library
+    steps:
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: sdk
+          version: $(DotnetSdkVersion)
+      - task: CmdLine@2
+        displayName: Build Solution
+        inputs:
+          script: 'dotnet build $(PathToSocialSdkProject) --configuration $(BuildConfiguration) --verbosity normal'
+      - task: CmdLine@2
+        displayName: Run Tests
+        inputs:
+          script: 'dotnet test $(PathToSolution) --configuration $(BuildConfiguration) --verbosity normal'
