@@ -7,12 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "�
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		azure-pipelines.yml = azure-pipelines.yml
 		Nuget.props = Nuget.props
 		README.md = README.md
 		Version.props = Version.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TmsFrameUnmarshaller", "src\Discord.SocialSdk\Discord.SocialSdk.csproj", "{37D9622F-E05E-439D-84A0-933909727DE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.SocialSdk", "src\Discord.SocialSdk\Discord.SocialSdk.csproj", "{37D9622F-E05E-439D-84A0-933909727DE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
