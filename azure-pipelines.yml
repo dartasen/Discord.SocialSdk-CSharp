@@ -1,6 +1,6 @@
 variables:
   PathToSolution: 'DiscordSocialSDKWrapper.sln'
-  PathToSocialSdkProject: 'Discord.SocialSdk/Discord.SocialSdk.csproj'
+  PathToSocialSdkProject: 'src/Discord.SocialSdk/Discord.SocialSdk.csproj'
   DotnetSdkVersion: '9.x'
   BuildConfiguration: 'Release'
 
