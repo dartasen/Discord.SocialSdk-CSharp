@@ -1,0 +1,10 @@
+﻿<Project Sdk="MSTest.Sdk/3.6.4">
+
+    <PropertyGroup>
+        <IsTestProject>True</IsTestProject>
+        <IsPackable>False</IsPackable>
+        <IsPublishable>False</IsPublishable>
+        <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
+    </PropertyGroup>
+
+</Project>
