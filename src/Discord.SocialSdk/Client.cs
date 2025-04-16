@@ -223,8 +223,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.ErrorToString(type, &__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -261,8 +264,13 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.GetDefaultAudioDeviceId(&__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
+
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -291,8 +299,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.GetDefaultCommunicationScopes(&__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -317,8 +328,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.GetDefaultPresenceScopes(&__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -332,8 +346,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.GetVersionHash(&__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -383,8 +400,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.StatusToString(type, &__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -398,8 +418,11 @@ public class Client : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.Client.ThreadToString(type, &__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -2341,14 +2364,14 @@ public class Client : IDisposable
               __scratch, &__scratchUsed, 1024, &__metadataValueOwnership, metadata.Count);
             {
                 int __i = 0;
-                foreach (var (__metadataKey, __metadataValue) in metadata)
+                foreach (KeyValuePair<string, string> kvp in metadata)
                 {
                     NativeMethods.Discord_String __metadataKeySpan;
                     NativeMethods.Discord_String __metadataValueSpan;
                     __metadataKeyOwnership[__i] = NativeMethods.__InitStringLocal(
-                      __scratch, &__scratchUsed, 1024, &__metadataKeySpan, __metadataKey);
+                      __scratch, &__scratchUsed, 1024, &__metadataKeySpan, kvp.Key);
                     __metadataValueOwnership[__i] = NativeMethods.__InitStringLocal(
-                      __scratch, &__scratchUsed, 1024, &__metadataValueSpan, __metadataValue);
+                      __scratch, &__scratchUsed, 1024, &__metadataValueSpan, kvp.Value);
                     __metadataKeys[__i] = __metadataKeySpan;
                     __metadataValues[__i] = __metadataValueSpan;
                     __i++;
@@ -2466,14 +2489,14 @@ public class Client : IDisposable
               __scratch, &__scratchUsed, 1024, &__metadataValueOwnership, metadata.Count);
             {
                 int __i = 0;
-                foreach (var (__metadataKey, __metadataValue) in metadata)
+                foreach (KeyValuePair<string, string> kvp in metadata)
                 {
                     NativeMethods.Discord_String __metadataKeySpan;
                     NativeMethods.Discord_String __metadataValueSpan;
                     __metadataKeyOwnership[__i] = NativeMethods.__InitStringLocal(
-                      __scratch, &__scratchUsed, 1024, &__metadataKeySpan, __metadataKey);
+                      __scratch, &__scratchUsed, 1024, &__metadataKeySpan, kvp.Key);
                     __metadataValueOwnership[__i] = NativeMethods.__InitStringLocal(
-                      __scratch, &__scratchUsed, 1024, &__metadataValueSpan, __metadataValue);
+                      __scratch, &__scratchUsed, 1024, &__metadataValueSpan, kvp.Value);
                     __metadataKeys[__i] = __metadataKeySpan;
                     __metadataValues[__i] = __metadataValueSpan;
                     __i++;
@@ -2971,18 +2994,18 @@ public class Client : IDisposable
               __scratch, &__scratchUsed, 1024, &__lobbyMetadataValueOwnership, lobbyMetadata.Count);
             {
                 int __i = 0;
-                foreach (var (__lobbyMetadataKey, __lobbyMetadataValue) in lobbyMetadata)
+                foreach (KeyValuePair<string, string> kvp in lobbyMetadata)
                 {
                     NativeMethods.Discord_String __lobbyMetadataKeySpan;
                     NativeMethods.Discord_String __lobbyMetadataValueSpan;
                     __lobbyMetadataKeyOwnership[__i] = NativeMethods.__InitStringLocal(
-                      __scratch, &__scratchUsed, 1024, &__lobbyMetadataKeySpan, __lobbyMetadataKey);
+                      __scratch, &__scratchUsed, 1024, &__lobbyMetadataKeySpan, kvp.Key);
                     __lobbyMetadataValueOwnership[__i] =
                       NativeMethods.__InitStringLocal(__scratch,
                                                       &__scratchUsed,
                                                       1024,
                                                       &__lobbyMetadataValueSpan,
-                                                      __lobbyMetadataValue);
+                                                      kvp.Value);
                     __lobbyMetadataKeys[__i] = __lobbyMetadataKeySpan;
                     __lobbyMetadataValues[__i] = __lobbyMetadataValueSpan;
                     __i++;
@@ -3010,7 +3033,7 @@ public class Client : IDisposable
                                                      memberMetadata.Count);
             {
                 int __i = 0;
-                foreach (var (__memberMetadataKey, __memberMetadataValue) in memberMetadata)
+                foreach (KeyValuePair<string, string> kvp in memberMetadata)
                 {
                     NativeMethods.Discord_String __memberMetadataKeySpan;
                     NativeMethods.Discord_String __memberMetadataValueSpan;
@@ -3019,13 +3042,13 @@ public class Client : IDisposable
                                                       &__scratchUsed,
                                                       1024,
                                                       &__memberMetadataKeySpan,
-                                                      __memberMetadataKey);
+                                                      kvp.Key);
                     __memberMetadataValueOwnership[__i] =
                       NativeMethods.__InitStringLocal(__scratch,
                                                       &__scratchUsed,
                                                       1024,
                                                       &__memberMetadataValueSpan,
-                                                      __memberMetadataValue);
+                                                      kvp.Value);
                     __memberMetadataKeys[__i] = __memberMetadataKeySpan;
                     __memberMetadataValues[__i] = __memberMetadataValueSpan;
                     __i++;

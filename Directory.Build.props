@@ -2,12 +2,16 @@
 
 	<!-- Following properties can be overriden per project -->
 	<PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<ProjectRootDir>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), '.git/index'))</ProjectRootDir>
+    </PropertyGroup>
 
 </Project>

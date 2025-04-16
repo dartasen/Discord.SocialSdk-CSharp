@@ -112,8 +112,12 @@ public class AdditionalContent : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.AdditionalContent.TypeToString(type, &__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
+            
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -166,8 +170,12 @@ public class AdditionalContent : IDisposable
             {
                 return null;
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
-	<Import Project="..\..\Version.props" />
+	<Import Project="$(ProjectRootDir)\Version.props" />
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DebugType>full</DebugType>
@@ -8,11 +8,16 @@
 	</PropertyGroup>
 	
 	<PropertyGroup>
-		<IsTrimmable>True</IsTrimmable>
-		<IsAotCompatible>true</IsAotCompatible>
+		<IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">True</IsTrimmable>
+		<IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
 	</PropertyGroup>
 
 	<!-- Import properties to build a NuGet -->
-	<Import Project="..\..\Nuget.props" />
+	<Import Project="$(ProjectRootDir)\Nuget.props" />
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<PackageReference Include="System.Memory" Version="4.6.3" />
+		<PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+	</ItemGroup>
 
 </Project>
