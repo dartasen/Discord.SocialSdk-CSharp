@@ -1,6 +1,6 @@
 variables:
-  PathToSolution: './DiscordSocialSDKWrapper.sln'
-  PathToSocialSdkProject: './Discord.SocialSdk/Discord.SocialSdk.csproj'
+  PathToSolution: 'DiscordSocialSDKWrapper.sln'
+  PathToSocialSdkProject: 'src/Discord.SocialSdk/Discord.SocialSdk.csproj'
   DotnetSdkVersion: '9.x'
   BuildConfiguration: 'Release'
 
@@ -8,17 +8,29 @@ trigger:
   branches:
     include:
       - master
+  paths:
+    exclude:
+    - README.md
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - '*'
+  paths:
+    exclude:
+    - README.md
 
 jobs:
   - job: Build
     strategy:
       matrix:
         windows:
-          image: 'windows-latest'
+          image: 'windows-2022'
         linux:
-          image: 'ubuntu-latest'
+          image: 'ubuntu-24.04'
         macOS:
-          image: 'macOS-latest'
+          image: 'macOS-14'
     pool:
       vmImage: $(image)
     displayName: Build Library

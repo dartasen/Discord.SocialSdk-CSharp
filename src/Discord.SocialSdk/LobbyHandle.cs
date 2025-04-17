@@ -333,12 +333,16 @@ public class LobbyHandle : IDisposable
             var __returnValue = new Dictionary<string, string>((int)__returnValueNative.size);
             for (int __i = 0; __i < (int)__returnValueNative.size; __i++)
             {
-                var key = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr,
-                                                  (int)__returnValueNative.keys[__i].size);
-                var value = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr,
-                                                    (int)__returnValueNative.values[__i].size);
+#if NETSTANDARD2_0
+                var key = MarshalP.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr, (int)__returnValueNative.keys[__i].size);
+                var value = MarshalP.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr, (int)__returnValueNative.values[__i].size);
+#else
+                var key = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr, (int)__returnValueNative.keys[__i].size);
+                var value = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr, (int)__returnValueNative.values[__i].size);
+#endif
                 __returnValue[key] = value;
             }
+
             NativeMethods.Discord_FreeProperties(__returnValueNative);
             return __returnValue;
         }

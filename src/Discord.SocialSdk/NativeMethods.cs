@@ -1,28 +1,15 @@
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Discord.SocialSdk.Attributes;
 
 namespace Discord.SocialSdk;
 
 public static unsafe class NativeMethods
 {
-#if UNITY_IOS && !UNITY_EDITOR
-    public const string LibraryName = "__Internal";
-#else
     public const string LibraryName = "discord_partner_sdk";
-#endif
 
     static NativeMethods()
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
-    AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-    AndroidJavaObject activity =
-      unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-    AndroidJavaClass socialSdkClass =
-      new AndroidJavaClass("com.discord.socialsdk.DiscordSocialSdkInit");
-    socialSdkClass.CallStatic("setEngineActivity", activity);
-#endif
         unsafe
         {
             // It's possible that the scripting domain was unloaded while there
@@ -65,7 +52,7 @@ public static unsafe class NativeMethods
             Free = (void*)Marshal.GetFunctionPointerForDelegate<Discord_FreeFn>(UnmanagedFree);
         }
 
-        [MonoPInvokeCallback(typeof(Discord_FreeFn))]
+        [AOT.MonoPInvokeCallback(typeof(Discord_FreeFn))]
         public static void UnmanagedFree(void* userData)
         {
             var handle = GCHandle.FromIntPtr((IntPtr)userData);
@@ -92,7 +79,11 @@ public static unsafe class NativeMethods
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe static void __InitString(Discord_String* str, string value)
     {
+#if NETSTANDARD2_0
+        str->ptr = (byte*)MarshalP.StringToCoTaskMemUTF8(value);
+#else
         str->ptr = (byte*)Marshal.StringToCoTaskMemUTF8(value);
+#endif
         str->size = (UIntPtr)Encoding.UTF8.GetByteCount(value);
     }
 
@@ -112,12 +103,22 @@ public static unsafe class NativeMethods
         var byteCount = Encoding.UTF8.GetByteCount(value);
         if (*bufUsed + byteCount > bufCapacity)
         {
+#if NETSTANDARD2_0
+            str->ptr = (byte*)MarshalP.StringToCoTaskMemUTF8(value);
+#else
             str->ptr = (byte*)Marshal.StringToCoTaskMemUTF8(value);
+#endif
             str->size = (UIntPtr)byteCount;
             return true;
         }
         var span = new Span<byte>(buf + *bufUsed, bufCapacity - *bufUsed);
+
+#if NETSTANDARD2_0
+        var byteCountWritten = EncodingUTF8P.GetBytes(value.AsSpan(), span);
+#else
         var byteCountWritten = Encoding.UTF8.GetBytes(value, span);
+#endif
+
         str->ptr = buf + *bufUsed;
         *bufUsed += byteCountWritten;
         str->size = (UIntPtr)byteCount;
@@ -928,7 +929,7 @@ public static unsafe class NativeMethods
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void OnVoiceStateChanged(ulong userId, void* __userData);
 
-        [MonoPInvokeCallback(typeof(OnVoiceStateChanged))]
+        [AOT.MonoPInvokeCallback(typeof(OnVoiceStateChanged))]
         public static void OnVoiceStateChanged_Handler(ulong userId, void* __userData)
         {
             var __callback =
@@ -950,7 +951,7 @@ public static unsafe class NativeMethods
         public delegate void OnParticipantChanged(ulong userId, bool added, void* __userData);
 
 
-        [MonoPInvokeCallback(typeof(OnParticipantChanged))]
+        [AOT.MonoPInvokeCallback(typeof(OnParticipantChanged))]
         public static void OnParticipantChanged_Handler(ulong userId,
                                                         bool added,
                                                         void* __userData)
@@ -974,7 +975,7 @@ public static unsafe class NativeMethods
         public delegate void OnSpeakingStatusChanged(ulong userId,
                                                      bool isPlayingSound,
                                                      void* __userData);
-        [MonoPInvokeCallback(typeof(OnSpeakingStatusChanged))]
+        [AOT.MonoPInvokeCallback(typeof(OnSpeakingStatusChanged))]
         public static void OnSpeakingStatusChanged_Handler(ulong userId,
                                                            bool isPlayingSound,
                                                            void* __userData)
@@ -1000,7 +1001,7 @@ public static unsafe class NativeMethods
                                              int errorDetail,
                                              void* __userData);
 #if UNITY
-        [MonoPInvokeCallback(typeof(OnStatusChanged))]
+        [AOT.MonoPInvokeCallback(typeof(OnStatusChanged))]
 #endif
         public static void OnStatusChanged_Handler(SocialSdk.Call.Status status,
                                                    SocialSdk.Call.Error error,
@@ -1694,7 +1695,7 @@ public static unsafe class NativeMethods
         public IntPtr Handle;
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void EndCallCallback(void* __userData);
-        [MonoPInvokeCallback(typeof(EndCallCallback))]
+        [AOT.MonoPInvokeCallback(typeof(EndCallCallback))]
         public static void EndCallCallback_Handler(void* __userData)
         {
             var __callback =
@@ -1714,7 +1715,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void EndCallsCallback(void* __userData);
-        [MonoPInvokeCallback(typeof(EndCallsCallback))]
+        [AOT.MonoPInvokeCallback(typeof(EndCallsCallback))]
         public static void EndCallsCallback_Handler(void* __userData)
         {
             var __callback =
@@ -1734,7 +1735,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void GetCurrentInputDeviceCallback(AudioDevice* device, void* __userData);
-        [MonoPInvokeCallback(typeof(GetCurrentInputDeviceCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetCurrentInputDeviceCallback))]
         public static void GetCurrentInputDeviceCallback_Handler(AudioDevice* device,
                                                                  void* __userData)
         {
@@ -1755,7 +1756,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void GetCurrentOutputDeviceCallback(AudioDevice* device, void* __userData);
-        [MonoPInvokeCallback(typeof(GetCurrentOutputDeviceCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetCurrentOutputDeviceCallback))]
         public static void GetCurrentOutputDeviceCallback_Handler(AudioDevice* device,
                                                                   void* __userData)
         {
@@ -1777,7 +1778,7 @@ public static unsafe class NativeMethods
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void GetInputDevicesCallback(Discord_AudioDeviceSpan devices,
                                                      void* __userData);
-        [MonoPInvokeCallback(typeof(GetInputDevicesCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetInputDevicesCallback))]
         public static void GetInputDevicesCallback_Handler(Discord_AudioDeviceSpan devices,
                                                            void* __userData)
         {
@@ -1803,7 +1804,7 @@ public static unsafe class NativeMethods
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void GetOutputDevicesCallback(Discord_AudioDeviceSpan devices,
                                                       void* __userData);
-        [MonoPInvokeCallback(typeof(GetOutputDevicesCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetOutputDevicesCallback))]
         public static void GetOutputDevicesCallback_Handler(Discord_AudioDeviceSpan devices,
                                                             void* __userData)
         {
@@ -1830,7 +1831,7 @@ public static unsafe class NativeMethods
         public delegate void DeviceChangeCallback(Discord_AudioDeviceSpan inputDevices,
                                                   Discord_AudioDeviceSpan outputDevices,
                                                   void* __userData);
-        [MonoPInvokeCallback(typeof(DeviceChangeCallback))]
+        [AOT.MonoPInvokeCallback(typeof(DeviceChangeCallback))]
         public static void DeviceChangeCallback_Handler(Discord_AudioDeviceSpan inputDevices,
                                                         Discord_AudioDeviceSpan outputDevices,
                                                         void* __userData)
@@ -1862,7 +1863,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void SetInputDeviceCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(SetInputDeviceCallback))]
+        [AOT.MonoPInvokeCallback(typeof(SetInputDeviceCallback))]
         public static void SetInputDeviceCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -1882,7 +1883,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void NoAudioInputCallback(bool inputDetected, void* __userData);
-        [MonoPInvokeCallback(typeof(NoAudioInputCallback))]
+        [AOT.MonoPInvokeCallback(typeof(NoAudioInputCallback))]
         public static void NoAudioInputCallback_Handler(bool inputDetected, void* __userData)
         {
             var __callback =
@@ -1902,7 +1903,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void SetOutputDeviceCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(SetOutputDeviceCallback))]
+        [AOT.MonoPInvokeCallback(typeof(SetOutputDeviceCallback))]
         public static void SetOutputDeviceCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -1925,7 +1926,7 @@ public static unsafe class NativeMethods
                                                              ulong memberId,
                                                              bool added,
                                                              void* __userData);
-        [MonoPInvokeCallback(typeof(VoiceParticipantChangedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(VoiceParticipantChangedCallback))]
         public static void VoiceParticipantChangedCallback_Handler(ulong lobbyId,
                                                                    ulong memberId,
                                                                    bool added,
@@ -1955,7 +1956,7 @@ public static unsafe class NativeMethods
                                                        ulong channels,
                                                        bool* outShouldMute,
                                                        void* __userData);
-        [MonoPInvokeCallback(typeof(UserAudioReceivedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UserAudioReceivedCallback))]
         public static void UserAudioReceivedCallback_Handler(ulong userId,
                                                              short* data,
                                                              ulong samplesPerChannel,
@@ -1990,7 +1991,7 @@ public static unsafe class NativeMethods
                                                        int sampleRate,
                                                        ulong channels,
                                                        void* __userData);
-        [MonoPInvokeCallback(typeof(UserAudioCapturedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UserAudioCapturedCallback))]
         public static void UserAudioCapturedCallback_Handler(short* data,
                                                              ulong samplesPerChannel,
                                                              int sampleRate,
@@ -2017,7 +2018,7 @@ public static unsafe class NativeMethods
                                                    Discord_String code,
                                                    Discord_String redirectUri,
                                                    void* __userData);
-        [MonoPInvokeCallback(typeof(AuthorizationCallback))]
+        [AOT.MonoPInvokeCallback(typeof(AuthorizationCallback))]
         public static void AuthorizationCallback_Handler(ClientResult* result,
                                                          Discord_String code,
                                                          Discord_String redirectUri,
@@ -2028,9 +2029,11 @@ public static unsafe class NativeMethods
                 .DelegateFromPointer<SocialSdk.Client.AuthorizationCallback>(__userData);
             try
             {
-                __callback(new Discord.SocialSdk.ClientResult(*result, 0),
-                           Marshal.PtrToStringUTF8((IntPtr)code.ptr, (int)code.size),
-                           Marshal.PtrToStringUTF8((IntPtr)redirectUri.ptr, (int)redirectUri.size));
+#if NETSTANDARD2_0
+                __callback(new Discord.SocialSdk.ClientResult(*result, 0), MarshalP.PtrToStringUTF8((IntPtr)code.ptr, (int)code.size), MarshalP.PtrToStringUTF8((IntPtr)redirectUri.ptr, (int)redirectUri.size));
+#else
+                __callback(new Discord.SocialSdk.ClientResult(*result, 0), Marshal.PtrToStringUTF8((IntPtr)code.ptr, (int)code.size), Marshal.PtrToStringUTF8((IntPtr)redirectUri.ptr, (int)redirectUri.size));
+#endif
             }
             catch (Exception ex)
             {
@@ -2047,7 +2050,7 @@ public static unsafe class NativeMethods
                                                       ulong id,
                                                       Discord_String name,
                                                       void* __userData);
-        [MonoPInvokeCallback(typeof(FetchCurrentUserCallback))]
+        [AOT.MonoPInvokeCallback(typeof(FetchCurrentUserCallback))]
         public static void FetchCurrentUserCallback_Handler(ClientResult* result,
                                                             ulong id,
                                                             Discord_String name,
@@ -2058,9 +2061,12 @@ public static unsafe class NativeMethods
                 .DelegateFromPointer<SocialSdk.Client.FetchCurrentUserCallback>(__userData);
             try
             {
-                __callback(new Discord.SocialSdk.ClientResult(*result, 0),
-                           id,
-                           Marshal.PtrToStringUTF8((IntPtr)name.ptr, (int)name.size));
+#if NETSTANDARD2_0
+                string __data = MarshalP.PtrToStringUTF8((IntPtr)name.ptr, (int)name.size);
+#else
+                string __data = Marshal.PtrToStringUTF8((IntPtr)name.ptr, (int)name.size);
+#endif
+                __callback(new Discord.SocialSdk.ClientResult(*result, 0), id, __data);
             }
             catch (Exception ex)
             {
@@ -2079,7 +2085,7 @@ public static unsafe class NativeMethods
                                                    int expiresIn,
                                                    Discord_String scopes,
                                                    void* __userData);
-        [MonoPInvokeCallback(typeof(TokenExchangeCallback))]
+        [AOT.MonoPInvokeCallback(typeof(TokenExchangeCallback))]
         public static void TokenExchangeCallback_Handler(
           ClientResult* result,
           Discord_String accessToken,
@@ -2094,13 +2100,25 @@ public static unsafe class NativeMethods
                 .DelegateFromPointer<SocialSdk.Client.TokenExchangeCallback>(__userData);
             try
             {
+#if NETSTANDARD2_0
                 __callback(
-                  new Discord.SocialSdk.ClientResult(*result, 0),
-                  Marshal.PtrToStringUTF8((IntPtr)accessToken.ptr, (int)accessToken.size),
-                  Marshal.PtrToStringUTF8((IntPtr)refreshToken.ptr, (int)refreshToken.size),
-                  tokenType,
-                  expiresIn,
-                  Marshal.PtrToStringUTF8((IntPtr)scopes.ptr, (int)scopes.size));
+                      new Discord.SocialSdk.ClientResult(*result, 0),
+                      MarshalP.PtrToStringUTF8((IntPtr)accessToken.ptr, (int)accessToken.size),
+                      MarshalP.PtrToStringUTF8((IntPtr)refreshToken.ptr, (int)refreshToken.size),
+                      tokenType,
+                      expiresIn,
+                      MarshalP.PtrToStringUTF8((IntPtr)scopes.ptr, (int)scopes.size)
+                );
+#else
+                __callback(
+                      new Discord.SocialSdk.ClientResult(*result, 0),
+                      Marshal.PtrToStringUTF8((IntPtr)accessToken.ptr, (int)accessToken.size),
+                      Marshal.PtrToStringUTF8((IntPtr)refreshToken.ptr, (int)refreshToken.size),
+                      tokenType,
+                      expiresIn,
+                      Marshal.PtrToStringUTF8((IntPtr)scopes.ptr, (int)scopes.size)
+                );
+#endif
             }
             catch (Exception ex)
             {
@@ -2115,7 +2133,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void AuthorizeDeviceScreenClosedCallback(void* __userData);
-        [MonoPInvokeCallback(typeof(AuthorizeDeviceScreenClosedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(AuthorizeDeviceScreenClosedCallback))]
         public static void AuthorizeDeviceScreenClosedCallback_Handler(void* __userData)
         {
             var __callback =
@@ -2136,7 +2154,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void TokenExpirationCallback(void* __userData);
-        [MonoPInvokeCallback(typeof(TokenExpirationCallback))]
+        [AOT.MonoPInvokeCallback(typeof(TokenExpirationCallback))]
         public static void TokenExpirationCallback_Handler(void* __userData)
         {
             var __callback =
@@ -2157,7 +2175,7 @@ public static unsafe class NativeMethods
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UpdateProvisionalAccountDisplayNameCallback(ClientResult* result,
                                                                          void* __userData);
-        [MonoPInvokeCallback(typeof(UpdateProvisionalAccountDisplayNameCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UpdateProvisionalAccountDisplayNameCallback))]
         public static void UpdateProvisionalAccountDisplayNameCallback_Handler(ClientResult* result,
                                                                                void* __userData)
         {
@@ -2177,7 +2195,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UpdateTokenCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(UpdateTokenCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UpdateTokenCallback))]
         public static void UpdateTokenCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -2197,7 +2215,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void DeleteUserMessageCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(DeleteUserMessageCallback))]
+        [AOT.MonoPInvokeCallback(typeof(DeleteUserMessageCallback))]
         public static void DeleteUserMessageCallback_Handler(ClientResult* result,
                                                              void* __userData)
         {
@@ -2218,7 +2236,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void EditUserMessageCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(EditUserMessageCallback))]
+        [AOT.MonoPInvokeCallback(typeof(EditUserMessageCallback))]
         public static void EditUserMessageCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -2238,7 +2256,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void ProvisionalUserMergeRequiredCallback(void* __userData);
-        [MonoPInvokeCallback(typeof(ProvisionalUserMergeRequiredCallback))]
+        [AOT.MonoPInvokeCallback(typeof(ProvisionalUserMergeRequiredCallback))]
         public static void ProvisionalUserMergeRequiredCallback_Handler(void* __userData)
         {
             var __callback =
@@ -2259,7 +2277,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void OpenMessageInDiscordCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(OpenMessageInDiscordCallback))]
+        [AOT.MonoPInvokeCallback(typeof(OpenMessageInDiscordCallback))]
         public static void OpenMessageInDiscordCallback_Handler(ClientResult* result,
                                                                 void* __userData)
         {
@@ -2282,7 +2300,7 @@ public static unsafe class NativeMethods
         public delegate void SendUserMessageCallback(ClientResult* result,
                                                      ulong messageId,
                                                      void* __userData);
-        [MonoPInvokeCallback(typeof(SendUserMessageCallback))]
+        [AOT.MonoPInvokeCallback(typeof(SendUserMessageCallback))]
         public static void SendUserMessageCallback_Handler(ClientResult* result,
                                                            ulong messageId,
                                                            void* __userData)
@@ -2304,7 +2322,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void MessageCreatedCallback(ulong messageId, void* __userData);
-        [MonoPInvokeCallback(typeof(MessageCreatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(MessageCreatedCallback))]
         public static void MessageCreatedCallback_Handler(ulong messageId, void* __userData)
         {
             var __callback =
@@ -2326,7 +2344,7 @@ public static unsafe class NativeMethods
         public delegate void MessageDeletedCallback(ulong messageId,
                                                     ulong channelId,
                                                     void* __userData);
-        [MonoPInvokeCallback(typeof(MessageDeletedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(MessageDeletedCallback))]
         public static void MessageDeletedCallback_Handler(ulong messageId,
                                                           ulong channelId,
                                                           void* __userData)
@@ -2348,7 +2366,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void MessageUpdatedCallback(ulong messageId, void* __userData);
-        [MonoPInvokeCallback(typeof(MessageUpdatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(MessageUpdatedCallback))]
         public static void MessageUpdatedCallback_Handler(ulong messageId, void* __userData)
         {
             var __callback =
@@ -2370,7 +2388,7 @@ public static unsafe class NativeMethods
         public delegate void LogCallback(Discord_String message,
                                          LoggingSeverity severity,
                                          void* __userData);
-        [MonoPInvokeCallback(typeof(LogCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LogCallback))]
         public static void LogCallback_Handler(Discord_String message,
                                                LoggingSeverity severity,
                                                void* __userData)
@@ -2380,8 +2398,12 @@ public static unsafe class NativeMethods
                 __userData);
             try
             {
-                __callback(Marshal.PtrToStringUTF8((IntPtr)message.ptr, (int)message.size),
-                           severity);
+#if NETSTANDARD2_0
+                string __value = MarshalP.PtrToStringUTF8((IntPtr)message.ptr, (int)message.size);
+#else
+                string __value = Marshal.PtrToStringUTF8((IntPtr)message.ptr, (int)message.size);
+#endif
+                __callback(__value, severity);
             }
             catch (Exception ex)
             {
@@ -2397,7 +2419,7 @@ public static unsafe class NativeMethods
                                              SocialSdk.Client.Error error,
                                              int errorDetail,
                                              void* __userData);
-        [MonoPInvokeCallback(typeof(OnStatusChanged))]
+        [AOT.MonoPInvokeCallback(typeof(OnStatusChanged))]
         public static void OnStatusChanged_Handler(SocialSdk.Client.Status status,
                                                    SocialSdk.Client.Error error,
                                                    int errorDetail,
@@ -2422,7 +2444,7 @@ public static unsafe class NativeMethods
         public delegate void CreateOrJoinLobbyCallback(ClientResult* result,
                                                        ulong lobbyId,
                                                        void* __userData);
-        [MonoPInvokeCallback(typeof(CreateOrJoinLobbyCallback))]
+        [AOT.MonoPInvokeCallback(typeof(CreateOrJoinLobbyCallback))]
         public static void CreateOrJoinLobbyCallback_Handler(ClientResult* result,
                                                              ulong lobbyId,
                                                              void* __userData)
@@ -2446,7 +2468,7 @@ public static unsafe class NativeMethods
         public delegate void GetGuildChannelsCallback(ClientResult* result,
                                                       Discord_GuildChannelSpan guildChannels,
                                                       void* __userData);
-        [MonoPInvokeCallback(typeof(GetGuildChannelsCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetGuildChannelsCallback))]
         public static void GetGuildChannelsCallback_Handler(ClientResult* result,
                                                             Discord_GuildChannelSpan guildChannels,
                                                             void* __userData)
@@ -2476,7 +2498,7 @@ public static unsafe class NativeMethods
         public delegate void GetUserGuildsCallback(ClientResult* result,
                                                    Discord_GuildMinimalSpan guilds,
                                                    void* __userData);
-        [MonoPInvokeCallback(typeof(GetUserGuildsCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetUserGuildsCallback))]
         public static void GetUserGuildsCallback_Handler(ClientResult* result,
                                                          Discord_GuildMinimalSpan guilds,
                                                          void* __userData)
@@ -2503,7 +2525,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void LeaveLobbyCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(LeaveLobbyCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LeaveLobbyCallback))]
         public static void LeaveLobbyCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -2523,7 +2545,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void LinkOrUnlinkChannelCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(LinkOrUnlinkChannelCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LinkOrUnlinkChannelCallback))]
         public static void LinkOrUnlinkChannelCallback_Handler(ClientResult* result,
                                                                void* __userData)
         {
@@ -2544,7 +2566,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void LobbyCreatedCallback(ulong lobbyId, void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyCreatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyCreatedCallback))]
         public static void LobbyCreatedCallback_Handler(ulong lobbyId, void* __userData)
         {
             var __callback =
@@ -2564,7 +2586,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void LobbyDeletedCallback(ulong lobbyId, void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyDeletedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyDeletedCallback))]
         public static void LobbyDeletedCallback_Handler(ulong lobbyId, void* __userData)
         {
             var __callback =
@@ -2586,7 +2608,7 @@ public static unsafe class NativeMethods
         public delegate void LobbyMemberAddedCallback(ulong lobbyId,
                                                       ulong memberId,
                                                       void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyMemberAddedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyMemberAddedCallback))]
         public static void LobbyMemberAddedCallback_Handler(ulong lobbyId,
                                                             ulong memberId,
                                                             void* __userData)
@@ -2610,7 +2632,7 @@ public static unsafe class NativeMethods
         public delegate void LobbyMemberRemovedCallback(ulong lobbyId,
                                                         ulong memberId,
                                                         void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyMemberRemovedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyMemberRemovedCallback))]
         public static void LobbyMemberRemovedCallback_Handler(ulong lobbyId,
                                                               ulong memberId,
                                                               void* __userData)
@@ -2634,7 +2656,7 @@ public static unsafe class NativeMethods
         public delegate void LobbyMemberUpdatedCallback(ulong lobbyId,
                                                         ulong memberId,
                                                         void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyMemberUpdatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyMemberUpdatedCallback))]
         public static void LobbyMemberUpdatedCallback_Handler(ulong lobbyId,
                                                               ulong memberId,
                                                               void* __userData)
@@ -2656,7 +2678,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void LobbyUpdatedCallback(ulong lobbyId, void* __userData);
-        [MonoPInvokeCallback(typeof(LobbyUpdatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(LobbyUpdatedCallback))]
         public static void LobbyUpdatedCallback_Handler(ulong lobbyId, void* __userData)
         {
             var __callback =
@@ -2678,7 +2700,7 @@ public static unsafe class NativeMethods
         public delegate void AcceptActivityInviteCallback(ClientResult* result,
                                                           Discord_String joinSecret,
                                                           void* __userData);
-        [MonoPInvokeCallback(typeof(AcceptActivityInviteCallback))]
+        [AOT.MonoPInvokeCallback(typeof(AcceptActivityInviteCallback))]
         public static void AcceptActivityInviteCallback_Handler(ClientResult* result,
                                                                 Discord_String joinSecret,
                                                                 void* __userData)
@@ -2688,8 +2710,13 @@ public static unsafe class NativeMethods
                 .DelegateFromPointer<SocialSdk.Client.AcceptActivityInviteCallback>(__userData);
             try
             {
-                __callback(new Discord.SocialSdk.ClientResult(*result, 0),
-                           Marshal.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size));
+#if NETSTANDARD2_0
+                string __joinSecret = MarshalP.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size);
+#else
+                string __joinSecret = Marshal.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size);
+#endif
+
+                __callback(new Discord.SocialSdk.ClientResult(*result, 0), __joinSecret);
             }
             catch (Exception ex)
             {
@@ -2702,7 +2729,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void SendActivityInviteCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(SendActivityInviteCallback))]
+        [AOT.MonoPInvokeCallback(typeof(SendActivityInviteCallback))]
         public static void SendActivityInviteCallback_Handler(ClientResult* result,
                                                               void* __userData)
         {
@@ -2723,7 +2750,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void ActivityInviteCallback(ActivityInvite* invite, void* __userData);
-        [MonoPInvokeCallback(typeof(ActivityInviteCallback))]
+        [AOT.MonoPInvokeCallback(typeof(ActivityInviteCallback))]
         public static void ActivityInviteCallback_Handler(ActivityInvite* invite,
                                                           void* __userData)
         {
@@ -2744,7 +2771,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void ActivityJoinCallback(Discord_String joinSecret, void* __userData);
-        [MonoPInvokeCallback(typeof(ActivityJoinCallback))]
+        [AOT.MonoPInvokeCallback(typeof(ActivityJoinCallback))]
         public static void ActivityJoinCallback_Handler(Discord_String joinSecret,
                                                         void* __userData)
         {
@@ -2753,7 +2780,12 @@ public static unsafe class NativeMethods
                 .DelegateFromPointer<SocialSdk.Client.ActivityJoinCallback>(__userData);
             try
             {
-                __callback(Marshal.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size));
+#if NETSTANDARD2_0
+                string __joinSecret = MarshalP.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size);
+#else
+                string __joinSecret = Marshal.PtrToStringUTF8((IntPtr)joinSecret.ptr, (int)joinSecret.size);
+#endif
+                __callback(__joinSecret);
             }
             catch (Exception ex)
             {
@@ -2766,7 +2798,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UpdateStatusCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(UpdateStatusCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UpdateStatusCallback))]
         public static void UpdateStatusCallback_Handler(ClientResult* result, void* __userData)
         {
             var __callback =
@@ -2786,7 +2818,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UpdateRichPresenceCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(UpdateRichPresenceCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UpdateRichPresenceCallback))]
         public static void UpdateRichPresenceCallback_Handler(ClientResult* result,
                                                               void* __userData)
         {
@@ -2807,7 +2839,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UpdateRelationshipCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(UpdateRelationshipCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UpdateRelationshipCallback))]
         public static void UpdateRelationshipCallback_Handler(ClientResult* result,
                                                               void* __userData)
         {
@@ -2828,7 +2860,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void SendFriendRequestCallback(ClientResult* result, void* __userData);
-        [MonoPInvokeCallback(typeof(SendFriendRequestCallback))]
+        [AOT.MonoPInvokeCallback(typeof(SendFriendRequestCallback))]
         public static void SendFriendRequestCallback_Handler(ClientResult* result,
                                                              void* __userData)
         {
@@ -2851,7 +2883,7 @@ public static unsafe class NativeMethods
         public delegate void RelationshipCreatedCallback(ulong userId,
                                                          bool isDiscordRelationshipUpdate,
                                                          void* __userData);
-        [MonoPInvokeCallback(typeof(RelationshipCreatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(RelationshipCreatedCallback))]
         public static void RelationshipCreatedCallback_Handler(ulong userId,
                                                                bool isDiscordRelationshipUpdate,
                                                                void* __userData)
@@ -2875,7 +2907,7 @@ public static unsafe class NativeMethods
         public delegate void RelationshipDeletedCallback(ulong userId,
                                                          bool isDiscordRelationshipUpdate,
                                                          void* __userData);
-        [MonoPInvokeCallback(typeof(RelationshipDeletedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(RelationshipDeletedCallback))]
         public static void RelationshipDeletedCallback_Handler(ulong userId,
                                                                bool isDiscordRelationshipUpdate,
                                                                void* __userData)
@@ -2899,7 +2931,7 @@ public static unsafe class NativeMethods
         public delegate void GetDiscordClientConnectedUserCallback(ClientResult* result,
                                                                    UserHandle* user,
                                                                    void* __userData);
-        [MonoPInvokeCallback(typeof(GetDiscordClientConnectedUserCallback))]
+        [AOT.MonoPInvokeCallback(typeof(GetDiscordClientConnectedUserCallback))]
         public static void GetDiscordClientConnectedUserCallback_Handler(ClientResult* result,
                                                                          UserHandle* user,
                                                                          void* __userData)
@@ -2923,7 +2955,7 @@ public static unsafe class NativeMethods
         }
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void UserUpdatedCallback(ulong userId, void* __userData);
-        [MonoPInvokeCallback(typeof(UserUpdatedCallback))]
+        [AOT.MonoPInvokeCallback(typeof(UserUpdatedCallback))]
         public static void UserUpdatedCallback_Handler(ulong userId, void* __userData)
         {
             var __callback =

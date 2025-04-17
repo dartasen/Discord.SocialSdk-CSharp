@@ -112,8 +112,11 @@ public class UserHandle : IDisposable
             {
                 return null;
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -127,8 +130,11 @@ public class UserHandle : IDisposable
         {
             var __returnValue = new NativeMethods.Discord_String();
             NativeMethods.UserHandle.AvatarTypeToString(type, &__returnValue);
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -155,8 +161,11 @@ public class UserHandle : IDisposable
             {
                 NativeMethods.UserHandle.AvatarUrl(self, animatedType, staticType, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -177,8 +186,11 @@ public class UserHandle : IDisposable
             {
                 NativeMethods.UserHandle.DisplayName(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -250,8 +262,11 @@ public class UserHandle : IDisposable
             {
                 return null;
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -362,8 +377,11 @@ public class UserHandle : IDisposable
             {
                 NativeMethods.UserHandle.Username(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }

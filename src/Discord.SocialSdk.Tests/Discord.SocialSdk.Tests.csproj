@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsTestProject>True</IsTestProject>
+        <IsPackable>False</IsPackable>
+        <IsPublishable>False</IsPublishable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="[7.2.0]" />
+        <PackageReference Include="FluentAssertions.Analyzers" Version="[0.34.1]">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MSTest" Version="3.8.3" />
+        <PackageReference Include="NSubstitute" Version="5.3.0" />
+    </ItemGroup>
+
+    <!-- CVE -->
+    <ItemGroup>
+        <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Discord.SocialSdk\Discord.SocialSdk.csproj" />
+    </ItemGroup>
+
+</Project>

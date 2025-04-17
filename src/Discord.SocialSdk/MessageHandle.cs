@@ -264,8 +264,11 @@ public class MessageHandle : IDisposable
             {
                 NativeMethods.MessageHandle.Content(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -389,10 +392,13 @@ public class MessageHandle : IDisposable
             var __returnValue = new Dictionary<string, string>((int)__returnValueNative.size);
             for (int __i = 0; __i < (int)__returnValueNative.size; __i++)
             {
-                var key = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr,
-                                                  (int)__returnValueNative.keys[__i].size);
-                var value = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr,
-                                                    (int)__returnValueNative.values[__i].size);
+#if NETSTANDARD2_0
+                var key = MarshalP.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr, (int)__returnValueNative.keys[__i].size);
+                var value = MarshalP.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr, (int)__returnValueNative.values[__i].size);
+#else
+                var key = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.keys[__i].ptr, (int)__returnValueNative.keys[__i].size);
+                var value = Marshal.PtrToStringUTF8((IntPtr)__returnValueNative.values[__i].ptr, (int)__returnValueNative.values[__i].size);
+#endif
                 __returnValue[key] = value;
             }
             NativeMethods.Discord_FreeProperties(__returnValueNative);
@@ -421,8 +427,11 @@ public class MessageHandle : IDisposable
             {
                 NativeMethods.MessageHandle.RawContent(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }

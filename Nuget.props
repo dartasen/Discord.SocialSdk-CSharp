@@ -1,25 +1,35 @@
 <Project>
 
-	<!-- Used for pack -->
+	<!-- Nuget configuration -->
 	<PropertyGroup>
 		<RepositoryType>git</RepositoryType>
 		<Title>Discord Social SDK Wrapper</Title>
 		<Authors>dartasen</Authors>
 		<Copyright>Copyright © Discord 2025</Copyright>
-		<Description></Description>
-		<PackageProjectUrl></PackageProjectUrl>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<Description>C# Bindings for new Discord Social Sdk, that replaces Discord Game Sdk</Description>
+		<PackageTags>csharp;discord;sdk;discord sdk;discord social sdk;social sdk;unity discord;unity;discord wrapper</PackageTags>
+		<PackageProjectUrl>https://github.com/dartasen/Discord.SocialSdk-CSharp</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/dartasen/Discord.SocialSdk-CSharp.git</RepositoryUrl>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
 	
-	<!-- Package file -->
+	<!-- Packaged files -->
 	<ItemGroup>
-		<None Include="..\logo.png" Pack="true" Visible="false" PackagePath="" />
-        <None Include="..\README.md" Pack="true" Visible="false" PackagePath="" />
+		<Content Include="$(ProjectRootDir)\logo.png" Pack="true" Visible="false" PackagePath="." />
+        <Content Include="$(ProjectRootDir)\README.md" Pack="true" Visible="false" PackagePath="." />
+        <Content Include="$(ProjectRootDir)\LICENSE" Pack="true" Visible="false" PackagePath="." />
+        <Content Include="$(ProjectRootDir)\lib\win-x64\*" Pack="true" Visible="false" CopyToOutputDirectory="PreserveNewest" PackagePath=".\runtimes\win-x64\native" />
+        <Content Include="$(ProjectRootDir)\lib\linux-x64\*" Pack="true" Visible="false" CopyToOutputDirectory="PreserveNewest" PackagePath=".\runtimes\linux-x64\native" />
+        <Content Include="$(ProjectRootDir)\lib\osx\*" Pack="true" Visible="false" CopyToOutputDirectory="PreserveNewest" PackagePath=".\runtimes\osx\native" />
 	</ItemGroup>
 
 </Project>

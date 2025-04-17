@@ -95,8 +95,11 @@ public class ClientResult : IDisposable
             {
                 NativeMethods.ClientResult.ToString(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -144,8 +147,11 @@ public class ClientResult : IDisposable
             {
                 NativeMethods.ClientResult.Error(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
@@ -243,8 +249,11 @@ public class ClientResult : IDisposable
             {
                 NativeMethods.ClientResult.ResponseBody(self, &__returnValue);
             }
-            string __returnValueSurface =
-              Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#if NETSTANDARD2_0
+            string __returnValueSurface = MarshalP.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#else
+            string __returnValueSurface = Marshal.PtrToStringUTF8((IntPtr)__returnValue.ptr, (int)__returnValue.size);
+#endif
             NativeMethods.Discord_Free(__returnValue.ptr);
             return __returnValueSurface;
         }
